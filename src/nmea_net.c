@@ -11,9 +11,83 @@
 
 #include "nmea_net.h"
 
-#define INDENT_SPACES "  "
-
 char buffer[BUF_SIZE];
+
+static void parsing()
+{
+  char *str = NULL, *token;
+  char *saveptr;
+  char *sentence = malloc((NMEA_MAX_LENGTH + 2) * sizeof(char));
+
+  str = buffer;
+  for (int i = 1;; i++, str = NULL)
+  {
+    token = strtok_r(str, "\n", &saveptr);
+    if (token == NULL)
+      break;
+    sprintf(sentence, "%s\n\n", token);
+    // Pointer to struct containing the parsed data
+    nmea_s *data;
+    char buf[255];
+
+    // Parse it...
+    data = nmea_parse(sentence, strlen(sentence), 0);
+    if (NULL == data)
+    {
+      //printf("No data\n");
+    }
+    else
+    {
+
+      if (NMEA_GPRMC == data->type)
+      {
+        printf("GPRMC sentence\n");
+        nmea_gprmc_s *pos = (nmea_gprmc_s *)data;
+        printf("Longitude:\n");
+        printf("  Degrees: %d\n", pos->longitude.degrees);
+        printf("  Minutes: %f\n", pos->longitude.minutes);
+        printf("  Cardinal: %c\n", (char)pos->longitude.cardinal);
+        printf("Latitude:\n");
+        printf("  Degrees: %d\n", pos->latitude.degrees);
+        printf("  Minutes: %f\n", pos->latitude.minutes);
+        printf("  Cardinal: %c\n", (char)pos->latitude.cardinal);
+        strftime(buf, sizeof(buf), "%H:%M:%S", &pos->time);
+        printf("Time: %s\n", buf);
+      }
+
+      if (NMEA_GPGGA == data->type)
+      {
+        nmea_gpgga_s *gpgga = (nmea_gpgga_s *)data;
+
+        printf("GPGGA Sentence\n");
+        printf("Number of satellites: %d\n", gpgga->n_satellites);
+        printf("Altitude: %d %c\n", gpgga->altitude, gpgga->altitude_unit);
+      }
+
+      if (NMEA_GPGLL == data->type)
+      {
+        nmea_gpgll_s *gpgll = (nmea_gpgll_s *)data;
+
+        printf("GPGLL Sentence\n");
+        printf("Longitude:\n");
+        printf("  Degrees: %d\n", gpgll->longitude.degrees);
+        printf("  Minutes: %f\n", gpgll->longitude.minutes);
+        printf("  Cardinal: %c\n", (char)gpgll->longitude.cardinal);
+        printf("Latitude:\n");
+        printf("  Degrees: %d\n", gpgll->latitude.degrees);
+        printf("  Minutes: %f\n", gpgll->latitude.minutes);
+        printf("  Cardinal: %c\n", (char)gpgll->latitude.cardinal);
+      }
+
+      nmea_free(data);
+    }
+  }
+
+  free(str);
+  free(token);
+  free(saveptr);
+  free(sentence);
+}
 
 static void app(const char *address)
 {
@@ -46,77 +120,9 @@ static void app(const char *address)
         printf("Server disconnected !\n");
         break;
       }
-
-      char *str1, *str2, *token, *subtoken;
-      char *saveptr1, *saveptr2;
-      int j;
-      char *sentence = malloc(BUF_SIZE);
-
-      for (j = 1, str1 = buffer;; j++, str1 = NULL)
-      {
-        token = strtok_r(str1, "\n", &saveptr1);
-        if (token == NULL)
-          break;
-        sprintf(sentence, "%s\n\n", token);
-        // Pointer to struct containing the parsed data
-        nmea_s *data;
-        char buf[255];
-
-        // Parse it...
-        data = nmea_parse(sentence, strlen(sentence), 0);
-        if (NULL == data)
-        {
-          //printf("No data\n");
-        }
-        else
-        {
-
-          if (NMEA_GPRMC == data->type)
-          {
-            printf("GPRMC sentence\n");
-            nmea_gprmc_s *pos = (nmea_gprmc_s *)data;
-            printf("Longitude:\n");
-            printf("  Degrees: %d\n", pos->longitude.degrees);
-            printf("  Minutes: %f\n", pos->longitude.minutes);
-            printf("  Cardinal: %c\n", (char)pos->longitude.cardinal);
-            printf("Latitude:\n");
-            printf("  Degrees: %d\n", pos->latitude.degrees);
-            printf("  Minutes: %f\n", pos->latitude.minutes);
-            printf("  Cardinal: %c\n", (char)pos->latitude.cardinal);
-            strftime(buf, sizeof(buf), "%H:%M:%S", &pos->time);
-            printf("Time: %s\n", buf);
-          }
-
-          if (NMEA_GPGGA == data->type)
-          {
-            nmea_gpgga_s *gpgga = (nmea_gpgga_s *)data;
-
-            printf("GPGGA Sentence\n");
-            printf("Number of satellites: %d\n", gpgga->n_satellites);
-            printf("Altitude: %d %c\n", gpgga->altitude, gpgga->altitude_unit);
-          }
-
-          if (NMEA_GPGLL == data->type)
-          {
-            nmea_gpgll_s *gpgll = (nmea_gpgll_s *)data;
-
-            printf("GPGLL Sentence\n");
-            printf("Longitude:\n");
-            printf("  Degrees: %d\n", gpgll->longitude.degrees);
-            printf("  Minutes: %f\n", gpgll->longitude.minutes);
-            printf("  Cardinal: %c\n", (char)gpgll->longitude.cardinal);
-            printf("Latitude:\n");
-            printf("  Degrees: %d\n", gpgll->latitude.degrees);
-            printf("  Minutes: %f\n", gpgll->latitude.minutes);
-            printf("  Cardinal: %c\n", (char)gpgll->latitude.cardinal);
-          }
-
-          nmea_free(data);
-        }
-      }
+      parsing();
     }
   }
-
   end_connection(sock);
 }
 
