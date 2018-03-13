@@ -7,46 +7,48 @@
 
 /* NMEA sentence types */
 typedef enum {
-	NMEA_UNKNOWN,
-	NMEA_GPGGA,
-	NMEA_GPGLL,
-	NMEA_GPRMC
+  NMEA_UNKNOWN,
+  NMEA_GPGGA,
+  NMEA_GPGLL,
+  NMEA_GPRMC
 } nmea_t;
 
 /* NMEA cardinal direction types */
 typedef char nmea_cardinal_t;
-#define NMEA_CARDINAL_DIR_NORTH		(nmea_cardinal_t) 'N'
-#define NMEA_CARDINAL_DIR_EAST		(nmea_cardinal_t) 'E'
-#define NMEA_CARDINAL_DIR_SOUTH		(nmea_cardinal_t) 'S'
-#define NMEA_CARDINAL_DIR_WEST		(nmea_cardinal_t) 'W'
-#define NMEA_CARDINAL_DIR_UNKNOWN	(nmea_cardinal_t) '\0'
+#define NMEA_CARDINAL_DIR_NORTH (nmea_cardinal_t)'N'
+#define NMEA_CARDINAL_DIR_EAST (nmea_cardinal_t)'E'
+#define NMEA_CARDINAL_DIR_SOUTH (nmea_cardinal_t)'S'
+#define NMEA_CARDINAL_DIR_WEST (nmea_cardinal_t)'W'
+#define NMEA_CARDINAL_DIR_UNKNOWN (nmea_cardinal_t)'\0'
 
 /**
  * NMEA data base struct
  *
  * This struct will be extended by the parser data structs (ex: nmea_gpgll_s).
  */
-typedef struct {
-	nmea_t type;
-	int errors;
+typedef struct
+{
+  nmea_t type;
+  int errors;
 } nmea_s;
 
 /* GPS position struct */
-typedef struct {
-	double minutes;
-	int degrees;
-	nmea_cardinal_t cardinal;
+typedef struct
+{
+  double minutes;
+  int degrees;
+  nmea_cardinal_t cardinal;
 } nmea_position;
 
 /* NMEA sentence max length, including \r\n (chars) */
-#define NMEA_MAX_LENGTH		82
+#define NMEA_MAX_LENGTH 82
 
 /* NMEA sentence endings, should be \r\n according the NMEA 0183 standard */
-#define NMEA_END_CHAR_1		'\n'
-#define NMEA_END_CHAR_2		'\n'
+#define NMEA_END_CHAR_1 '\n'
+#define NMEA_END_CHAR_2 '\n'
 
 /* NMEA sentence prefix length (num chars), Ex: GPGLL */
-#define NMEA_PREFIX_LENGTH	5
+#define NMEA_PREFIX_LENGTH 5
 
 #ifdef __cplusplus
 extern "C" {
@@ -118,4 +120,4 @@ extern nmea_s *nmea_parse(char *sentence, size_t length, int check_checksum);
 }
 #endif
 
-#endif  /* INC_NMEA_H */
+#endif /* INC_NMEA_H */
