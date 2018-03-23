@@ -1,6 +1,15 @@
-#ifndef NMEA_NET_H
-#define NMEA_NET_H
+//
+//  parser.h
+//  NMEA_NET_Test
+//
+//  Created by Hugo Bidois on 23/03/2018.
+//  Copyright © 2018 Hugo Bidois. All rights reserved.
+//
 
+#ifndef parser_h
+#define parser_h
+
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -22,9 +31,9 @@ typedef struct in_addr IN_ADDR;
 #define BUF_SIZE 1024
 
 static void parsing();
-static void app(const char *address);
+void app(const char *address);
 static int init_connection(const char *address);
 static void end_connection(int sock);
 static int read_server(SOCKET sock, char *buffer);
 
-#endif /* guard */
+#endif /* parser_h */
